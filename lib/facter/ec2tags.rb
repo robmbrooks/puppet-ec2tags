@@ -26,8 +26,7 @@ Facter.add(:ec2_tags) do
     instance_id = Facter.value('ec2_metadata')['instance-id']
     region = Facter.value(:ec2_metadata)['placement']['availability-zone'][0..-2]
     ec2 = Aws::EC2::Client.new(region: region)
-    instance = ec2.describe_instances(instance_ids: [instance_id])
-    tags = instance.reservations[0].instances[0].tags
+    tags = ec2.describe_tags(filters: [{ name: "resource-id", values: [instance_id] }]).tags
     taghash = { }
     tags.each do |tag|
       taghash[tag['key'].downcase] = tag['value'].downcase
